@@ -46,7 +46,6 @@
       (if (= i "quit")
         ret
         (do
-          (print p)
           (command p c)
           (print "\n# ") (flush)
           (recur (read-line) (conj ret i))))
@@ -57,7 +56,7 @@
 (defn command [p c]
   ;  (let [
   (let [cm (str (first p))]
-    (println "COMMAND: " cm)
+;    (print (str "COMMAND: " cm "\n"))
     (cond
       (= cm "help") (command-help p c)
       (= cm "model") (command-model p c)

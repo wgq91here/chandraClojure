@@ -3,7 +3,7 @@
             [korma.db :as db]
             [korma.core :as dbcore]
             [chandra.sdb :as sdb]
-            [puget.printer :refer :all]
+            [chandra.consoleout :refer :all]
             )
   ;  (:use )
   (:gen-class)
@@ -11,15 +11,12 @@
 
 (declare command-help-model model-list)
 
-(defn commmand-help-model [p]
-  (let [action (str (second p))]
+(defn commmand-help-model [p c]
+  (let [a (str (nth p 2 ""))]
     (cond
-      (= p "list") (do
-                     (prn "list help"))
-      (= p "create") (do
-                       (prn "create help"))
-      :else (do
-              (prn "list create update delete remove")))
+      (= a "list") "list help"
+      (= a "create") "create help"
+      :else "list create update delete remove")
     ))
 
 (defn command-model [p c]
@@ -36,12 +33,12 @@
   ;  model show [models]
   ;  model select user
   ;  model create user name:string ago:number
-  (cprint p (count p))
+;  (prn p)
   (let [a (second p)]
     (cond
-      (= a "help") (prn (commmand-help-model p c))
-      (= a "list") (prn (model-list p c))
-      :else (prn "UNKOWN ACTION. use `model help`."))
+      (= a "help") (print (commmand-help-model p c))
+      (= a "list") (cprint (model-list p c))
+      :else (print "UNKOWN ACTION. use `model help`."))
     )
   )
 
@@ -51,7 +48,5 @@
       "not a valid table name."
       (let [tb (sdb/d-table tbname)
             x (dbcore/select tb)]
-        (do
-          (cprint tb)
-          (cprint x)))
-      )))
+        x))
+    ))
