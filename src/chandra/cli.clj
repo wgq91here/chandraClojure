@@ -3,9 +3,9 @@
             [clojure.string :as str]
             [korma.db :as db]
             [korma.core :as dbcore]
-            [chandra.sdb :as sdb]
+            [puget.printer :refer :all]
             )
-  ;  (:use )
+  (:use [chandra.commandmodel])
   (:gen-class)
   )
 
@@ -34,7 +34,7 @@
 (defn cli-parser [i]
   (map first (re-seq #"/\s*(\".+?\"|[^:\s])+((\s?:\s*(\".+?\"|[^\s])+)|)|(\".+?\"|[^\"\s])+" i)))
 
-(declare command command-model)
+(declare command command-help)
 
 (defn cli-start [args]
   ;  (print (parse-opts args cli-options))
@@ -54,8 +54,6 @@
     )
   )
 
-(declare command-help command-model)
-
 (defn command [p c]
   ;  (let [
   (let [cm (str (first p))]
@@ -63,28 +61,11 @@
     (cond
       (= cm "help") (command-help p c)
       (= cm "model") (command-model p c)
-      (= cm "model1") (command-model p c)
       :else (do
-              (println "UNKOWN COMMAND!")))
+              (pprint "UNKOWN COMMAND!")))
     )
   )
 
 (defn command-help [p c]
   (println "HELP!")
-  )
-
-(defn command-model [p c]
-  ;  (let [tb (str (second p))]
-  ;    (println "MODEL: " tb)
-  ;    (let [md (sdb/dy-create-table-entity tb)]
-  ;      (println "MODEL ATTR: " md)
-  ;      )
-  ;    )
-  ;  (prn (symbol (second p)))
-  (let [tb (sdb/d-table (str (second p)))
-        x (dbcore/select tb)
-        ]
-    (prn tb)
-    (prn x)
-    )
   )

@@ -4,6 +4,7 @@
   :license {:name "Apache License 2.0"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/tools.cli "0.3.3"]
+                 [mvxcvi/puget "1.0.0"]
                  [compojure "1.4.0"]
                  [ring/ring-defaults "0.1.2"]
                  [ring/ring-anti-forgery "1.0.0"]
