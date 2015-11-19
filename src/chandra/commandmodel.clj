@@ -9,15 +9,30 @@
   (:gen-class)
   )
 
-(declare command-help-model model-list)
+(declare command-help-model model-list model-create)
 
 (defn commmand-help-model [p c]
   (let [a (str (nth p 2 ""))]
     (cond
-      (= a "list") "list help"
-      (= a "create") "create help"
+      (= a "list") "Syntax: model list modelname"
+      (= a "create") "Syntax: model create modelname fields [`binding:upload ...]"
       :else "list create update delete remove")
     ))
+
+(def not-found-table
+  "not found a valid table.")
+
+(def not-found-model-args
+  "not found a valid model name.")
+
+(defn get-args-model [p]
+  (str (nth p 2 "")))
+
+(defn check-args-model? [p]
+  (let [tbname (get-args-model p)]
+    (empty? tbname)
+    )
+  )
 
 (defn command-model [p c]
   ;  (let [tb (str (second p))]
@@ -33,20 +48,37 @@
   ;  model show [models]
   ;  model select user
   ;  model create user name:string ago:number
-;  (prn p)
+  ;  (prn p)
   (let [a (second p)]
     (cond
       (= a "help") (print (commmand-help-model p c))
-      (= a "list") (cprint (model-list p c))
+      (= a "show") (cprint (sdb/get-model (get-args-model p)))
+      (= a "create") (if (check-args-model? p)
+                       (cprint not-found-model-args)
+                       (cprint (model-create p c)))
+      (= a "list") (if (check-args-model? p)
+                     (cprint not-found-model-args)
+                     (cprint (model-list p c)))
       :else (print "UNKOWN ACTION. use `model help`."))
     )
   )
 
+(def ret-type
+  {:error nil,:value nil})
+
 (defn model-list [p c]
-  (let [tbname (str (nth p 2 ""))]
-    (if (empty? tbname)
-      "not a valid table name."
-      (let [tb (sdb/d-table tbname)
-            x (dbcore/select tb)]
-        x))
-    ))
+  (let [tb (sdb/def-table (get-args-model p))]
+    (if (nil? tb)
+      (merge ret-type {:error not-found-table})
+      (merge ret-type {:value (dbcore/select tb)}))
+    )
+  )
+
+(defn model-create [p c]
+  (let [tb (sdb/def-table (get-args-model p))]
+;    (cprint c)
+    (if (nil? tb)
+      (merge ret-type {:error not-found-table})
+      (merge ret-type {:value (dbcore/select tb)}))
+    )
+  )

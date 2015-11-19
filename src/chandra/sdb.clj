@@ -35,16 +35,68 @@
 ;    (prn xx)
 ;    (dbcore/select `x)))
 
-(defn d-table [table]
-  (let [t (symbol (str "tb_" table))
-        r (keyword table)
-        x `(dbcore/defentity ~t
-             (dbcore/pk :id)
-             (dbcore/table ~r)
-             (dbcore/database ~sys-db))]
-    (prn r)
-    @(eval x)
-    ))
+(defn get-table-obj-name [table]
+  (str "tb_" table))
+
+(defn get-model [t]
+  (let [st (get-table-obj-name t)
+        f (find-var (symbol (str "chandra.core/" st)))]
+    (if (nil? f)
+      nil
+      @f))
+  )
+
+(defn exist-model? [t]
+  (let [f (get-model t)]
+    (not (nil? f))
+    )
+  )
+
+(defn exist-table? [t]
+  (try
+    (let [tm (get-model t)]
+      (if (not (nil? tm))
+        (do
+          (dbcore/select tm (dbcore/limit 1))
+          true)
+        false))
+    ;    (throw (RuntimeException.))
+    (catch Exception e
+      ;      (if (= nil (.getMessage e))
+      ;        true
+      false
+      ;      ) ;(str "caught exception: " (.getMessage e))
+      )
+    )
+  )
+
+(defn undef-table [table]
+  (let [t (get-table-obj-name table)
+        st (symbol t)]
+    (ns-unmap *ns* st))
+  )
+
+(defn def-table [table]
+  (let [find-model (get-model table)
+        t (get-table-obj-name table)
+        st (symbol t)
+        r (keyword table)]
+    (if (nil? find-model)
+      (let [x `(dbcore/defentity ~st
+                 (dbcore/pk :id)
+                 (dbcore/table ~r)
+                 (dbcore/database ~sys-db))
+            dmodel @(eval x)]
+        (if (not (exist-table? table))
+          (undef-table table)
+          dmodel)
+        ;        @(eval x) ; new def & return
+        )
+      find-model ; return exist def
+      )
+    )
+  )
+
 
 ;(defn )
 ;(let [x @(dy-create-table-entity login_info (database db))] (select x))
