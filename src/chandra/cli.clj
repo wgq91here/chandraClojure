@@ -4,8 +4,10 @@
             [korma.db :as db]
             [korma.core :as dbcore]
             )
-  (:use [chandra.model]
-        [chandra.out])
+  (:use [chandra.out]
+        [chandra.tools]
+        [chandra.model]
+        [chandra.table])
   (:gen-class)
   )
 
@@ -31,14 +33,6 @@
     (read-stdin)
     ))
 
-(defn cli-parser [i]
-  (map first (re-seq #"/\s*(\".+?\"|[^:\s])+((\s?:\s*(\".+?\"|[^\s])+)|)|(\".+?\"|[^\"\s])+" i)))
-
-
-(def ret-type
-  {:error nil,
-   :value nil})
-
 (declare command merge-out command-help)
 
 (defn cli-start [args]
@@ -51,7 +45,7 @@
       (if (= i "quit")
         ret
         (do
-          (let [r (command p c)]
+          (let [r (command c)]
             (if (not (empty? r))
               (cprint r)))
           (print "# ") (flush)
@@ -66,14 +60,16 @@
 (defn merge-out [v]
   (merge ret-type v))
 
-(defn command [p c]
-  ;  (let [
-  (let [cm (str (first p))]
-    ;    (print (str "COMMAND: " cm "\n"))
-    (cond
-      (empty? cm) {}
-      (= cm "help") (merge-out (command-help p c))
-      (= cm "model") (merge-out (command-model p c))
-      :else (merge-out {:value "UNKOWN COMMAND!"}))
-    )
+(defn command [c]
+  (cprint c)
+  (command-model c)
+  ;  (let [cm (str (first p))]
+  ;    ;    (print (str "COMMAND: " cm "\n"))
+  ;    (cond
+  ;      (empty? cm) {}
+  ;      (= cm "help") (merge-out (command-help p c))
+  ;      (= cm "model") (merge-out (command-model p c))
+  ;      (= cm "table") (merge-out (command-table p c))
+  ;      :else (merge-out {:value "UNKOWN COMMAND!"}))
+  ;    )
   )

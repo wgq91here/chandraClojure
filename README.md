@@ -56,10 +56,12 @@ In browser,
 
 ```
  POST url : http://localhost:8088/c/model/
+ 
  POST data : {command: "create",
               model: "blog",
               fields: "title:string content:text",
               binding: "images:upload user"}
+              
  Require: {:error nil,
            :value ("blog table created","images table create"),
            :status "ok"}
