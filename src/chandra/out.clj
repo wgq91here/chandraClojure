@@ -1,4 +1,4 @@
-(ns chandra.consoleout
+(ns chandra.out
   (:require [clojure.string :as str]
             [puget.printer :as puget-printer]
             )

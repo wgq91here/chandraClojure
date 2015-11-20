@@ -1,4 +1,4 @@
-(ns chandra.commandmodel
+(ns chandra.model
   (:require [clojure.string :as str]
             [korma.db :as db]
             [korma.core :as dbcore]
