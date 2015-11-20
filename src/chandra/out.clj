@@ -7,7 +7,7 @@
 
 (defn cprint
   ([value]
-    (print (puget-printer/cprint-str value nil)))
+    (println (puget-printer/cprint-str value nil)))
   ([value opts]
-    (print (puget-printer/pprint value (assoc opts :print-color true))))
+    (println (puget-printer/pprint value (assoc opts :print-color true))))
   )

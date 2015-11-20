@@ -3,9 +3,9 @@
             [clojure.string :as str]
             [korma.db :as db]
             [korma.core :as dbcore]
-            [puget.printer :refer :all]
             )
-  (:use [chandra.commandmodel])
+  (:use [chandra.model]
+        [chandra.out])
   (:gen-class)
   )
 
@@ -34,7 +34,12 @@
 (defn cli-parser [i]
   (map first (re-seq #"/\s*(\".+?\"|[^:\s])+((\s?:\s*(\".+?\"|[^\s])+)|)|(\".+?\"|[^\"\s])+" i)))
 
-(declare command command-help)
+
+(def ret-type
+  {:error nil,
+   :value nil})
+
+(declare command merge-out command-help)
 
 (defn cli-start [args]
   ;  (print (parse-opts args cli-options))
@@ -46,25 +51,29 @@
       (if (= i "quit")
         ret
         (do
-          (command p c)
-          (print "\n# ") (flush)
+          (let [r (command p c)]
+            (if (not (empty? r))
+              (cprint r)))
+          (print "# ") (flush)
           (recur (read-line) (conj ret i))))
       )
     )
   )
 
+(defn command-help [p c]
+  {:value "HELP!"})
+
+(defn merge-out [v]
+  (merge ret-type v))
+
 (defn command [p c]
   ;  (let [
   (let [cm (str (first p))]
-;    (print (str "COMMAND: " cm "\n"))
+    ;    (print (str "COMMAND: " cm "\n"))
     (cond
-      (= cm "help") (command-help p c)
-      (= cm "model") (command-model p c)
-      :else (do
-              (pprint "UNKOWN COMMAND!")))
+      (empty? cm) {}
+      (= cm "help") (merge-out (command-help p c))
+      (= cm "model") (merge-out (command-model p c))
+      :else (merge-out {:value "UNKOWN COMMAND!"}))
     )
-  )
-
-(defn command-help [p c]
-  (println "HELP!")
   )

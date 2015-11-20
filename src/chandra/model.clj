@@ -3,9 +3,7 @@
             [korma.db :as db]
             [korma.core :as dbcore]
             [chandra.sdb :as sdb]
-            [chandra.consoleout :refer :all]
             )
-  ;  (:use )
   (:gen-class)
   )
 
@@ -16,7 +14,7 @@
     (cond
       (= a "list") "Syntax: model list modelname"
       (= a "create") "Syntax: model create modelname fields [`binding:upload ...]"
-      :else "list create update delete remove")
+      :else "Syntax: model [help list create update delete remove]")
     ))
 
 (def not-found-table
@@ -51,34 +49,31 @@
   ;  (prn p)
   (let [a (second p)]
     (cond
-      (= a "help") (print (commmand-help-model p c))
-      (= a "show") (cprint (sdb/get-model (get-args-model p)))
+      (= a "help") {:value (commmand-help-model p c)}
+      (= a "show") {:value (sdb/get-model (get-args-model p))}
       (= a "create") (if (check-args-model? p)
-                       (cprint not-found-model-args)
-                       (cprint (model-create p c)))
+                       {:error not-found-model-args}
+                       (model-create p c))
       (= a "list") (if (check-args-model? p)
-                     (cprint not-found-model-args)
-                     (cprint (model-list p c)))
-      :else (print "UNKOWN ACTION. use `model help`."))
+                     {:error not-found-model-args}
+                     (model-list p c))
+      :else {:error "UNKOWN ACTION. use `model help`."}
+      )
     )
   )
-
-(def ret-type
-  {:error nil,:value nil})
 
 (defn model-list [p c]
   (let [tb (sdb/def-table (get-args-model p))]
     (if (nil? tb)
-      (merge ret-type {:error not-found-table})
-      (merge ret-type {:value (dbcore/select tb)}))
+      {:error not-found-table}
+      {:value (dbcore/select tb)})
     )
   )
 
 (defn model-create [p c]
   (let [tb (sdb/def-table (get-args-model p))]
-;    (cprint c)
     (if (nil? tb)
-      (merge ret-type {:error not-found-table})
-      (merge ret-type {:value (dbcore/select tb)}))
+      {:error not-found-table}
+      {:value (dbcore/select tb)})
     )
   )

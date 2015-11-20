@@ -17,7 +17,6 @@
 (defmacro dy-create-table-entity [ent & body]
   (let [t (symbol (str "tb_" ent))
         real-table-name (keyword ent)]
-    (prn "!!!! " t)
     `(dbcore/defentity ~t
        (dbcore/pk :id)
        (dbcore/table ~real-table-name)
@@ -88,11 +87,10 @@
                  (dbcore/database ~sys-db))
             dmodel @(eval x)]
         (if (not (exist-table? table))
-          (undef-table table)
-          dmodel)
-        ;        @(eval x) ; new def & return
+          (undef-table table) ; undef if this table not exist
+          dmodel) ; return def model
         )
-      find-model ; return exist def
+      find-model ; return existed def
       )
     )
   )
