@@ -50,7 +50,9 @@ chandra.core=> (-main)
 # server start 8088
 
 ```
+
 In browser, 
+
 
 ```
  POST url : http://localhost:8088/c/model/
@@ -72,4 +74,4 @@ In browser,
 
 ## License
 
-Copyright © 2015 Apache 2.0
+Copyright © 2015 Eclipse Public License
