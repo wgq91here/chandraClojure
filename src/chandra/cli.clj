@@ -33,23 +33,23 @@
     (read-stdin)
     ))
 
-(declare command merge-out command-help)
+(declare command command-help)
 
 (defn cli-start [args]
   ;  (print (parse-opts args cli-options))
   ;  (print args)
   (print "\n# ") (flush)
   (loop [i (read-line) ret []]
-    (let [p (cli-parser i)
-          c (parse-opts p cli-options)] ;(seq (str/split i #" "))
-      (if (= i "quit")
-        ret
-        (do
-          (let [r (command c)]
+    (if (= i "quit")
+      ret
+      (do
+        (if (not (empty? i))
+          (let [r (command i)]
             (if (not (empty? r))
-              (cprint r)))
-          (print "# ") (flush)
-          (recur (read-line) (conj ret i))))
+              (cprint r))))
+        (print "# ") (flush)
+        (recur (read-line) (conj ret i))
+        )
       )
     )
   )
@@ -57,11 +57,7 @@
 (defn command-help [p c]
   {:value "HELP!"})
 
-(defn merge-out [v]
-  (merge ret-type v))
-
 (defn command [c]
-  (cprint c)
   (command-model c)
   ;  (let [cm (str (first p))]
   ;    ;    (print (str "COMMAND: " cm "\n"))
@@ -72,4 +68,7 @@
   ;      (= cm "table") (merge-out (command-table p c))
   ;      :else (merge-out {:value "UNKOWN COMMAND!"}))
   ;    )
+
+
+  ;  c (parse-args i cli-options)
   )

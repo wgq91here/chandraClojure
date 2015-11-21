@@ -1,6 +1,5 @@
 (ns chandra.model
   (:require [clojure.string :as str]
-            [clojure.tools.cli :refer [parse-opts]]
             [korma.db :as db]
             [korma.core :as dbcore]
             [chandra.sdb :as sdb]
@@ -25,12 +24,15 @@
   )
 
 (def model-command-options
-  [["-f" "--fields [name:type]" "Normal Fields"
-    :default "id:pk"]
-   ["-p" "--preset" "System's Preset DB"
-    :default nil]
-   ["-b" "--binding" "Special Fields"
-    :default nil]
+  [["-n" "--notchange" "Not'do change to model"
+    :default false]
+   ["-p" "--preset name" "System's Preset DB"
+    :default "none"]
+   ["-f" "--field name1:type1" "Normal Fields"
+    :default "id:pk"
+    :parse-fn #(cli-parser %)]
+   ["-b" "--binding name" "Special Fields"
+    :default ""]
    ])
 
 (defn commmand-help-model [p]
@@ -58,11 +60,8 @@
   ;  model create user name:string ago:number
   ;  (prn p)
 
-  (let [tp (:arguments c)
-        tc (parse-opts tp model-command-options)]
-    (cprint tp)
-    (cprint tc)
-    (cprint c)
+  (let [tc (parse-args c model-command-options)]
+    tc
     )
   ;  (let [a (second p)]
   ;    (cond
