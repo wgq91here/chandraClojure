@@ -1,6 +1,7 @@
 /target
 /classes
 /checkouts
+/nginx-clojure
 pom.xml
 pom.xml.asc
 *.jar
